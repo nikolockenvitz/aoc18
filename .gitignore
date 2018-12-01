@@ -1,6 +1,7 @@
 # Input- and Output-files
 input/
 output/
+cookies.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

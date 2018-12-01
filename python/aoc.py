@@ -2,12 +2,17 @@
 PATH_INPUT  = "../input/"
 PATH_OUTPUT = "../output/"
 IOFILE_PREFIX = ""
+IOFILE_DAYFORMAT = "02d"
 IOFILE_SUFFIX = ".txt"
+
+PATH_COOKIES = "../cookies.txt"
 
 import hashlib
 import sys
 import os
 import re
+import urllib.request
+import time
 
 class AOC:
     def __init__(self, day):
@@ -15,14 +20,16 @@ class AOC:
         print("# "*10 + "Day "+str(self.day) + " #"*10)
 
         # Filename of input- and output-file
-        twoDigitDay = format(self.day, '02d')
-
-        filename = IOFILE_PREFIX
-        filename+= twoDigitDay
-        filename+= IOFILE_SUFFIX
-        
+        filename = self.getIOFilenameForDay(self.day)
         self.filenameInput  = PATH_INPUT  + filename
         self.filenameOutput = PATH_OUTPUT + filename
+
+    @classmethod
+    def getIOFilenameForDay(cls, day):
+        filename = IOFILE_PREFIX
+        filename+= format(day, IOFILE_DAYFORMAT)
+        filename+= IOFILE_SUFFIX
+        return filename
 
     @classmethod
     def getDayFromFilepath(cls, filepath):
@@ -31,13 +38,54 @@ class AOC:
         firstNumber = int(numbers[0])
         return firstNumber
 
+    @classmethod
+    def saveTodaysInputToFile(cls):
+        url     = cls.__getTodaysInputUrl()
+        cookies = cls.__getCredentialCookies()
+
+        opener = urllib.request.build_opener()
+        for cookie in cookies:
+            opener.addheaders.append(('Cookie', cookie))
+
+        try:
+            response = opener.open(url)
+            data = response.read().decode()
+        except urllib.error.HTTPError as e:
+            print("Failed to get today's input...")
+            print(e)
+            input("Press Enter to exit")
+
+        cls.__saveTodaysInputToFile(data)
+
+    @classmethod
+    def __getTodaysInputUrl(cls):
+        localtime = time.localtime()
+        urlTemplate = "https://adventofcode.com/{YEAR}/day/{DAY}/input"
+        url = urlTemplate.format(YEAR = localtime.tm_year,
+                                 DAY  = localtime.tm_mday)
+        return url
+
+    @classmethod
+    def __getCredentialCookies(cls):
+        f = open(PATH_COOKIES)
+        cookies = f.read().splitlines()
+        f.close()
+        return cookies
+
+    @classmethod
+    def __saveTodaysInputToFile(cls, data):
+        filename = cls.getIOFilenameForDay(time.localtime().tm_mday)
+        f = open(PATH_INPUT + filename, "w")
+        f.write(data)
+        f.close()
+
     """
     Input/Output
     """
     def getFile(self, readLines=False):
         f = open(self.filenameInput, "r")
         if(readLines):
-            content = f.readlines()
+            content = f.read().splitlines()
         else:
             content = f.read().strip()
         f.close()
@@ -78,3 +126,5 @@ class AOC:
     def hashMD5(self, text):
         return self.hash(hashlib.md5, text)
 
+if __name__ == "__main__":
+    AOC.saveTodaysInputToFile()
