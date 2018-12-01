@@ -1,11 +1,13 @@
 
 PATH_INPUT  = "../input/"
 PATH_OUTPUT = "../output/"
-FILE_PREFIX = ""
-FILE_SUFFIX = ".txt"
+IOFILE_PREFIX = ""
+IOFILE_SUFFIX = ".txt"
 
 import hashlib
 import sys
+import os
+import re
 
 class AOC:
     def __init__(self, day):
@@ -13,12 +15,21 @@ class AOC:
         print("# "*10 + "Day "+str(self.day) + " #"*10)
 
         # Filename of input- and output-file
-        name = FILE_PREFIX
-        name+= format(self.day, '02d')
-        name+= FILE_SUFFIX
+        twoDigitDay = format(self.day, '02d')
+
+        filename = IOFILE_PREFIX
+        filename+= twoDigitDay
+        filename+= IOFILE_SUFFIX
         
-        self.filenameInput = PATH_INPUT + name
-        self.filenameOutput = PATH_OUTPUT + name
+        self.filenameInput  = PATH_INPUT  + filename
+        self.filenameOutput = PATH_OUTPUT + filename
+
+    @classmethod
+    def getDayFromFilepath(cls, filepath):
+        filename = os.path.basename(filepath)
+        numbers = re.findall("\d+", filename)
+        firstNumber = int(numbers[0])
+        return firstNumber
 
     """
     Input/Output
@@ -33,16 +44,16 @@ class AOC:
         return content
 
     def getFileLines(self):
-        return self.getFile(True)
+        return self.getFile(readLines=True)
 
-    def output(self, resultA, resultB, printTerminal=True):
+    def output(self, result1, result2, printTerminal=True):
         if(printTerminal):
-            print("ResultA:", resultA)
-            print("ResultB:", resultB)
+            print("Result1:", result1)
+            print("Result2:", result2)
         f = open(self.filenameOutput, "w")
-        f.write(str(resultA))
+        f.write(str(result1))
         f.write("\n")
-        f.write(str(resultB))
+        f.write(str(result2))
         f.close()
         
         if(printTerminal and "idlelib" not in sys.modules): input("")
