@@ -8,7 +8,7 @@ result1 = None
 result2 = None
 
 # Input
-file = aoc.getFile()
+file = aoc.getFileLines()
 
 # Implementation
 def part1():

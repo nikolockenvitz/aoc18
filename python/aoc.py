@@ -39,6 +39,22 @@ class AOC:
         return firstNumber
 
     @classmethod
+    def createTodaysPythonScript(cls):
+        f = open("day0.py", "r")
+        templateContent = f.read()
+        f.close()
+
+        localtime = time.localtime()
+        todaysFilename = "day" + str(localtime.tm_mday) + ".py"
+
+        if(os.path.exists(todaysFilename)):
+            print("Todays script does already exist.")
+        else:
+            f = open(todaysFilename, "w")
+            f.write(templateContent)
+            f.close()
+
+    @classmethod
     def saveTodaysInputToFile(cls):
         url     = cls.__getTodaysInputUrl()
         cookies = cls.__getCredentialCookies()
@@ -127,4 +143,5 @@ class AOC:
         return self.hash(hashlib.md5, text)
 
 if __name__ == "__main__":
+    AOC.createTodaysPythonScript()
     AOC.saveTodaysInputToFile()
