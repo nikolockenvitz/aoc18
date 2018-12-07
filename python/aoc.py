@@ -142,6 +142,17 @@ class AOC:
     def hashMD5(self, text):
         return self.hash(hashlib.md5, text)
 
+    """
+    Other basic operations
+    """
+    def copyList(self, list1):
+        newList = []
+        for element in list1:
+            if(type(element) == list):
+                element = self.copyList(element)
+            newList.append(element)
+        return newList
+
 if __name__ == "__main__":
     AOC.createTodaysPythonScript()
     AOC.saveTodaysInputToFile()
