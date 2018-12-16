@@ -96,10 +96,11 @@ def getSquareToNearestTarget(x, y, target):
             mini = solution
     return mini[2]
 
-def part1():
+def part1(elfAttackPower=3):
+    global cave
     global elfHitPoints
     global goblinHitPoints
-    global cave
+    
     rounds = 0
     while(1):
         rounds += 1
@@ -139,22 +140,46 @@ def part1():
                             mini = [cur[1], newx+d[0], newy+d[1]]
                 if(mini[0] != None):
                     target = cave[(mini[1],mini[2])]
-                    if(target[1] <= 3):
-                        # dies
+                    if(target[0] == "E" and target[1] <= 3):
+                        # elf dies
                         cave[(mini[1],mini[2])] = ["."]
-                        if(target[0] == "G"):
-                            goblinHitPoints -= target[1]
-                        else:
-                            elfHitPoints -= target[1]
+                        elfHitPoints -= target[1]
+                        if(elfAttackPower > 3): return False
+                    elif(target[0] == "G" and target[1] <= elfAttackPower):
+                        # goblin dies
+                        cave[(mini[1],mini[2])] = ["."]
+                        goblinHitPoints -= target[1]
                     else:
                         if(target[0] == "G"):
-                            goblinHitPoints -= 3
+                            goblinHitPoints -= elfAttackPower
+                            cave[(mini[1],mini[2])] = [target[0], target[1]-elfAttackPower, target[2]]
                         else:
                             elfHitPoints -= 3
-                        cave[(mini[1],mini[2])] = [target[0], target[1]-3, target[2]]
+                            cave[(mini[1],mini[2])] = [target[0], target[1]-3, target[2]]
 
 def part2():
-    return None
+    global cave
+    global elfHitPoints
+    global goblinHitPoints
+    
+    for elfAttackPower in range(4,100):
+        cave = {}
+        goblinHitPoints = 0
+        elfHitPoints = 0
+        for y in range(caveHeight):
+            for x in range(caveWidth):
+                cur = [file[y][x]]
+                if(cur[0] == "."): continue
+                if(cur[0] in "GE"):
+                    cur.append(200) # hit points
+                    if(cur[0] == "G"): goblinHitPoints += 200
+                    if(cur[0] == "E"): elfHitPoints += 200
+                    cur.append(-1) # round (when moved)
+                cave[(x,y)] = cur
+
+        outcome = part1(elfAttackPower)
+        if(outcome != False):
+            return outcome
 
 # Processing
 result1 = part1()
